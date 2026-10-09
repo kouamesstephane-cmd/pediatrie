@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Interactif — SANTE PUBLIQUE FORMULE</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        .font-comic {
+            font-family: 'Comic Neue', cursive, sans-serif;
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 min-h-screen flex flex-col items-center justify-between p-0 m-0 font-sans selection:bg-orange-500 selection:text-white relative overflow-x-hidden w-full">
+
+    <div class="absolute inset-0 bg-white -z-10"></div>
+
+    <div id="top-left-badge" class="fixed top-4 left-4 z-50 flex items-center gap-1">
+        <span class="inline-block bg-emerald-600 text-white text-[7px] font-bold px-2.5 py-1 rounded-xl uppercase tracking-widest shadow-lg shadow-emerald-600/20 font-comic lowercase">by ide steeff</span>
+    </div>
+
+    <div id="top-right-badge" class="fixed top-4 right-4 z-50 flex items-center gap-1">
+        <span class="inline-block bg-emerald-600 text-white text-[8px] font-bold px-3 py-1 rounded-xl uppercase tracking-widest shadow-lg shadow-emerald-600/20 font-comic">Ensemble, 100% au Diplôme d'Etat</span>
+    </div>
+
+    <div id="timer-container" class="fixed top-3 right-3 z-50 transition-all duration-300 hidden">
+        <div class="relative flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-2xl border-2 border-slate-200 p-1">
+            <svg class="w-10 h-10 transform -rotate-90" viewBox="0 0 36 36">
+                <path class="text-slate-200" stroke-width="3.5" stroke="currentColor" fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path id="timer-circle-path" class="text-orange-500 transition-all duration-300" stroke-dasharray="100, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <span id="timer-display-mini" class="text-slate-800 font-black text-[10px]">60:00</span>
+            </div>
+        </div>
+    </div>
+
+    <main class="w-full flex-grow flex items-center justify-center p-0 m-0">
+        <div id="app" class="w-full min-h-screen bg-white shadow-none rounded-none border-0 overflow-hidden relative flex flex-col justify-start">
+            
+            <div id="welcome-screen" class="p-3 md:p-4 text-center flex flex-col items-center justify-center w-full max-w-4xl mx-auto relative min-h-screen -mt-6">
+                
+                <div class="absolute inset-0 pointer-events-none overflow-hidden -z-10 opacity-50 flex flex-wrap justify-between items-center px-6 py-8">
+                    <svg class="w-8 h-8 text-emerald-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    <svg class="w-10 h-10 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    <svg class="w-9 h-9 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    <svg class="w-9 h-9 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <svg class="w-9 h-9 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    <svg class="w-9 h-9 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                </div>
+
+                <div class="mb-1.5 flex flex-col items-center gap-1">
+                    <span class="inline-block bg-emerald-600 text-white text-[11px] md:text-[13px] font-black px-3.5 py-1.5 rounded-xl uppercase tracking-widest shadow-sm">REVISION ENSEMBLE</span>
+                </div>
+
+                <div class="mb-3 w-full px-2">
+                    <h1 class="text-2xl md:text-4xl font-black text-slate-800 uppercase tracking-wide">SANTE PUBLIQUE FORMULE</h1>
+                    <p id="quiz-subtitle-info" class="text-sm md:text-base text-slate-500 mt-1.5 font-medium">Évaluation Santé Publique Formules (60 Questions — 60 minutes)</p>
+                    
+                    <div class="mt-4 p-3.5 bg-gradient-to-br from-slate-50 via-white to-orange-50/40 border border-slate-200/80 rounded-2xl text-left w-full mx-auto shadow-md shadow-slate-200/50 backdrop-blur-md">
+                        <div class="flex items-center gap-2 pb-2 mb-2.5 border-b border-slate-200/70">
+                            <div class="w-7 h-7 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-600 shadow-sm border border-orange-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-slate-900 text-xs md:text-sm uppercase tracking-wider">Avertissement</h3>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs md:text-sm">
+                            <div class="p-2.5 rounded-xl bg-white border border-slate-200/70 shadow-sm flex items-start gap-2.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div>
+                                    <strong class="text-emerald-600 font-bold block mb-0.5">Questions (QCD 1-30)</strong>
+                                    <span class="text-slate-600">-1 point en cas de mauvaise réponse.</span>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-white border border-slate-200/70 shadow-sm flex items-start gap-2.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                </svg>
+                                <div>
+                                    <strong class="text-emerald-600 font-bold block mb-0.5">QCM (31-60)</strong>
+                                    <span class="text-slate-600">Cochez la bonne réponse parmi les choix proposés.</span>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-white border border-slate-200/70 shadow-sm flex items-start gap-2.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <div>
+                                    <strong class="text-red-600 font-bold block mb-0.5">Système d'Autovalidation</strong>
+                                    <span class="text-slate-600">Tout changement d'onglet clôturera immédiatement le devoir.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="startQuiz()" class="w-full max-w-md bg-orange-500 hover:bg-orange-600 text-white font-extrabold py-3.5 px-6 rounded-xl shadow-md shadow-orange-500/20 transition duration-200 cursor-pointer text-sm md:text-base uppercase tracking-wider mt-4 mb-2">
+                    JE COMMENCE
+                </button>
+            </div>
+
+            <div id="quiz-screen" class="hidden p-4 md:p-10 w-full flex-grow pt-16">
+                <div id="all-questions-container" class="space-y-6 mb-8 w-full">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div class="pt-6 border-t border-slate-200 flex justify-end pb-12 w-full">
+                    <button onclick="submitQuiz()" class="w-full max-w-md bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 px-8 rounded-2xl shadow-lg shadow-emerald-600/20 transition duration-200 cursor-pointer text-xs uppercase tracking-wider text-center mx-auto">
+                        VALIDER MON DEVOIR
+                    </button>
+                </div>
+            </div>
+
+            <div id="result-screen" class="hidden p-4 text-center w-full max-w-4xl mx-auto pt-16">
+                <div class="w-16 h-16 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-extrabold text-emerald-600 mb-0.5">Évaluation Terminée !</h2>
+
+                <div id="appreciation-banner" class="mb-4 max-w-xl mx-auto p-2.5 rounded-2xl shadow-md transition-all duration-300"></div>
+
+                <div id="score-card-box" class="bg-slate-50 border border-slate-200 rounded-3xl p-4 mb-4 max-w-md mx-auto transition-colors shadow-lg">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Note Finale</div>
+                    <div id="final-note-display" class="text-3xl md:text-4xl font-black text-rose-600 mb-2">0.00 / 20</div>
+                    <div id="final-brut-display" class="text-xl text-blue-600 font-black mb-1">Score Brut : 0 / 60</div>
+                    <div id="penalty-summary-badge" class="text-[11px] font-bold text-rose-600 mt-0.5"></div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2.5 mb-6 max-w-md mx-auto text-xs">
+                    <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 p-2.5 rounded-2xl shadow-sm">
+                        <div class="font-bold text-base" id="correct-count">0</div>
+                        <div>Correctes</div>
+                    </div>
+                    <div class="bg-rose-50 border border-rose-200 text-rose-700 p-2.5 rounded-2xl shadow-sm">
+                        <div class="font-bold text-base" id="wrong-count">0</div>
+                        <div>Fausse(s)</div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 text-amber-700 p-2.5 rounded-2xl shadow-sm">
+                        <div class="font-bold text-base" id="unanswered-count">0</div>
+                        <div>Sans réponse</div>
+                    </div>
+                </div>
+
+                <div class="mb-6 max-w-md mx-auto">
+                    <button onclick="toggleCorrectionModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 px-6 rounded-2xl shadow-lg shadow-blue-600/20 transition duration-200 cursor-pointer text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h2m2 4h.01M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        CONSULTER LA CORRECTION DÉTAILLÉE
+                    </button>
+                </div>
+
+                <button onclick="restartQuiz()" class="w-full max-w-md bg-orange-500 hover:bg-orange-600 text-white font-extrabold py-3 rounded-2xl shadow-lg shadow-orange-500/20 transition cursor-pointer text-xs uppercase tracking-wider mx-auto mb-1">
+                    JE RECOMMENCE
+                </button>
+
+                <div class="text-[7px] font-bold text-slate-400 uppercase tracking-widest opacity-60 font-comic mt-3">
+                    by ide steeff
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="correction-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="flex justify-between items-center p-4 bg-slate-50 border-b border-slate-200">
+                <h3 class="font-black text-slate-800 text-base md:text-lg uppercase tracking-wide">Correction Détaillée & Réponses</h3>
+                <button onclick="toggleCorrectionModal()" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-200 transition cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div id="correction-content-container" class="p-4 md:p-6 overflow-y-auto space-y-4 flex-grow text-left">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-200 text-right">
+                <button onclick="toggleCorrectionModal()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-6 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-3 text-[11px] text-slate-400 border-t border-slate-200 bg-white w-full">
+        Module de Santé Publique Formules &copy; 2026 — Tous droits réservés.
+    </footer>
+
+    <script>
+        const masterQuestions = [
+            {
+                id: 1, type: 'vrai_faux',
+                text: "1. PC = Population cible, Pt = Population totale au 31/12 de l'année en cours.",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 2, type: 'vrai_faux',
+                text: "2. Enfants de 0 à 6 mois = 6,82% x Pt",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "FAUX"
+            },
+            {
+                id: 3, type: 'vrai_faux',
+                text: "3. Enfants de 0 à 11 mois = 3,5% x Pt donc Pt = PC / 0,035",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 4, type: 'vrai_faux',
+                text: "4. Enfants de 0 à 23 mois = 6,82% x Pt",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 5, type: 'vrai_faux',
+                text: "5. Enfants de 12 à 23 mois = 3,32% x Pt",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 6, type: 'vrai_faux',
+                text: "6. Enfants de 0 à 59 mois ou 0 à 5 ans et FAR ont la même proportion : 20% x Pt",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 7, type: 'vrai_faux',
+                text: "7. Enfants de 9 mois à 14 ans = 45% x Pt",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 8, type: 'vrai_faux',
+                text: "8. Jeunes filles de 9 ans = 1,86% x Pt",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 9, type: 'vrai_faux',
+                text: "9. Femmes enceintes ou Grossesses attendues = 4,7% x Pt",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "FAUX"
+            },
+            {
+                id: 10, type: 'vrai_faux',
+                text: "10. Equation de projection : Pt = Po (1+r)^t avec Po = population de départ, r = TAA, t = temps",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 11, type: 'vrai_faux',
+                text: "11. Equation fondamentale : Pt = Po + AN + SM",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 12, type: 'vrai_faux',
+                text: "12. Solde Migratoire SM = Immigrés + Emigrés",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "FAUX"
+            },
+            {
+                id: 13, type: 'vrai_faux',
+                text: "13. Accroissement Naturel AN = Naissances - Décès sur la même année",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 14, type: 'vrai_faux',
+                text: "14. Population moyenne PopM = (Pop départ + Pop arrivée) / 2 et les deux populations doivent être de la même année.",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 15, type: 'vrai_faux',
+                text: "15. Si on donne Pop au 01/01 et Pop au 31/12, on doit calculer la Pop moyenne obligatoirement, la Pop moyenne est prioritaire sur la Pop totale.",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 16, type: 'vrai_faux',
+                text: "16. Taux Brut de Natalité TBN = Naissances vivantes en 1 an / Pop totale ou moyenne x 100",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 17, type: 'vrai_faux',
+                text: "17. Taux Brut de Mortalité TBM = Effectif des malades / Pop totale x 100",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "FAUX"
+            },
+            {
+                id: 18, type: 'vrai_faux',
+                text: "18. Taux d'Accroissement Naturel TAN = Accroissement Naturel / Pop Fin d'année x 100",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 19, type: 'vrai_faux',
+                text: "19. TAA = (Pop arrivée - Pop départ) / Pop départ x 100 et aussi TAA = r = Pt/Po - 1 quand t=1",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 20, type: 'vrai_faux',
+                text: "20. Temps de dédoublement TD = 70 / TAA et Année de dédoublement AD = AR + TD",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 21, type: 'vrai_faux',
+                text: "21. Besoin Théorique BT = Pop cible x Objectif vaccinal x Nbre de contact x Facteur de perte x Période / 12",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 22, type: 'vrai_faux',
+                text: "22. Si BT est mensuel alors Période = 12, si BT est annuel alors Période = 1",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "FAUX"
+            },
+            {
+                id: 23, type: 'vrai_faux',
+                text: "23. Stock de sécurité en antigène (vaccin) SS = 25% x BT",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 24, type: 'vrai_faux',
+                text: "24. En monitorage, Population cible du monitorage PCm = PC / 2 car monitorage = 6 mois",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 25, type: 'vrai_faux',
+                text: "25. Disponibilité des Ressources DR = Temps disponible / Temps total x 100",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "FAUX"
+            },
+            {
+                id: 26, type: 'vrai_faux',
+                text: "26. Couverture Effective CE en vaccination tient compte des vaccins conservés entre +2°C et +8°C",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 27, type: 'vrai_faux',
+                text: "27. Taux de couverture vaccinale TCV = Nombre de personnes vaccinées / Nombre de personnes attendues x 100",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 28, type: 'vrai_faux',
+                text: "28. Rapport de masculinité Rm = Nombre d'hommes / Nombre de femmes x 100 ou x 10^n",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 29, type: 'vrai_faux',
+                text: "29. Age modal = l'âge qui a le plus grand effectif dans une série d'âge",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "VRAI"
+            },
+            {
+                id: 30, type: 'vrai_faux',
+                text: "30. Densité globale = Superficie totale / Population totale",
+                options: ["A. VRAI", "B. FAUX"],
+                correct: "FAUX"
+            },
+            {
+                id: 31, type: 'qcm',
+                text: "31. Quelle est la proportion des enfants de 1 à 4 ans ?",
+                options: [
+                    "A. 6% x Pt",
+                    "B. 3,32% x Pt",
+                    "C. 17,32% x Pt",
+                    "D. 20% x Pt"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 32, type: 'qcm',
+                text: "32. Quelle est la proportion des enfants de 9 à 13 ans ?",
+                options: [
+                    "A. 45% x Pt",
+                    "B. 17,32% x Pt",
+                    "C. 1,86% x Pt",
+                    "D. 6% x Pt"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 33, type: 'qcm',
+                text: "33. Quelle est la proportion des Naissances attendues ou Accouchements attendus ?",
+                options: [
+                    "A. 4,1% x Grossesses attendues",
+                    "B. 20% x Pt",
+                    "C. 4,7% x Pt",
+                    "D. 5% x Pt"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 34, type: 'qcm',
+                text: "34. Quelle est la proportion des Femmes séropositives ?",
+                options: [
+                    "A. 5% x Pt",
+                    "B. 4,7% x Pt",
+                    "C. 1,86% x Pt",
+                    "D. 4,1% x Grossesses attendues"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 35, type: 'qcm',
+                text: "35. Formule du Taux Général de Fécondité TGF ?",
+                options: [
+                    "A. Naissances vivantes en une année / Pop totale x 100",
+                    "B. Accroissement Naturel / Pop fin d'année x 100",
+                    "C. Naissances vivantes en une année / Nombre de FAR en une année x 100",
+                    "D. Effectif des décès / Pop totale x 100"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 36, type: 'qcm',
+                text: "36. Formule du Taux d'Accouchement Assisté TAccA ?",
+                options: [
+                    "A. Effectif des décès maternels / Naissances vivantes x 100",
+                    "B. Nombre de femmes enceintes / Pop totale x 100",
+                    "C. Effectif des femmes ayant été assistées pendant l'accouchement / Nombre d'accouchements attendus la même année x 100",
+                    "D. Naissances vivantes / FAR x 100"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 37, type: 'qcm',
+                text: "37. Formule du Taux de Mortalité Spécifique TMS ?",
+                options: [
+                    "A. Nombre d'enfants de 0 à 11 mois décédés / Total des naissances vivantes x 100",
+                    "B. Total de décès de la maladie la même année / Pop totale x 100",
+                    "C. Effectif des décès maternels / Naissances vivantes x 100",
+                    "D. Total des décès causés par une maladie / Nombre de cas x 100"
+                ],
+                correct: [1],
+                selectCount: 1
+            },
+            {
+                id: 38, type: 'qcm',
+                text: "38. Formule du Taux de Mortalité Juvénile TMJ ?",
+                options: [
+                    "A. Nombre d'enfants de 0 à 11 mois décédés / Total des naissances vivantes x 100",
+                    "B. Nombre de décès de 0 à moins de 28 jours / Total des naissances vivantes x 100",
+                    "C. Nombre d'enfants de 1 à 4 ans décédés / Enfants de 1 à 4 ans x 100",
+                    "D. Nombre de décès de 28j à 11 mois / Total des naissances vivantes x 100"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 39, type: 'qcm',
+                text: "39. Formule du Taux de Mortalité Maternelle TMM ?",
+                options: [
+                    "A. Nombre de décès de 0 à moins de 28 jours / Total des naissances vivantes x 100",
+                    "B. Effectif des décès maternels dans une année / Naissances vivantes de la même année x 100",
+                    "C. Nombre de décès de 0 à moins de 8 jours / Total des naissances vivantes x 100",
+                    "D. Total des décès causés par une maladie / Nombre de cas x 100"
+                ],
+                correct: [1],
+                selectCount: 1
+            },
+            {
+                id: 40, type: 'qcm',
+                text: "40. Formule du Taux de Mortalité Néonatale TMN ?",
+                options: [
+                    "A. Nombre de décès de 8 à moins de 28 jours / Total des naissances vivantes x 100",
+                    "B. Nombre de décès de 0 à moins de 8 jours / Total des naissances vivantes x 100",
+                    "C. Nombre de décès d'enfants de 0 à moins de 28 jours / Total des naissances vivantes x 100",
+                    "D. Nombre de décès de 28 jours à 11 mois / Total des naissances vivantes x 100"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 41, type: 'qcm',
+                text: "41. TMNP = Taux de Mortalité Néonatale Précoce ?",
+                options: [
+                    "A. Décès de 0 à moins de 28 jours / Total des naissances vivantes x 100",
+                    "B. Décès de 8 à moins de 28 jours / Total des naissances vivantes x 100",
+                    "C. Décès de 0 à moins de 8 jours / Total des naissances vivantes x 100",
+                    "D. Décès de 1 à 4 ans / Enfants de 1 à 4 ans x 100"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 42, type: 'qcm',
+                text: "42. TMNT = Taux de Mortalité Néonatale Tardif ?",
+                options: [
+                    "A. Décès de 0 à moins de 7 jours / Total des naissances vivantes x 100",
+                    "B. Décès de 8 à moins de 28 jours / Total des naissances vivantes x 100",
+                    "C. Décès de 0 à moins de 28 jours / Total des naissances vivantes x 100",
+                    "D. Décès de 28j à 11 mois / Total des naissances vivantes x 100"
+                ],
+                correct: [1],
+                selectCount: 1
+            },
+            {
+                id: 43, type: 'qcm',
+                text: "43. TMPN = Taux de Mortalité Post-Néonatale ?",
+                options: [
+                    "A. Décès de 0 à moins de 28 jours / Total des naissances vivantes x 100",
+                    "B. Décès de 0 à moins de 8 jours / Total des naissances vivantes x 100",
+                    "C. Décès maternels / Naissances vivantes x 100",
+                    "D. Décès de 28 jours à 11 mois / Total des naissances vivantes x 100"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 44, type: 'qcm',
+                text: "44. Formule du Besoin Théorique pour un trimestre, Période = ?",
+                options: [
+                    "A. 12",
+                    "B. 1",
+                    "C. 6",
+                    "D. 3"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 45, type: 'qcm',
+                text: "45. Formule du Stock de sécurité en consommables (seringues) ?",
+                options: [
+                    "A. 25% x BT = 25 x BT / 100",
+                    "B. 5% x BT",
+                    "C. 10% x BT = 10 x BT / 100",
+                    "D. 20% x BT"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 46, type: 'qcm',
+                text: "46. Formule de la Quantité à Commander QC ?",
+                options: [
+                    "A. BT - SS",
+                    "B. BT + SS",
+                    "C. Pop cible x Objectif / 12",
+                    "D. BR - Quantité en stock"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 47, type: 'qcm',
+                text: "47. En monitorage vaccination, Disponibilité des Ressources DR = ?",
+                options: [
+                    "A. Pop en stratégie fixe + Pop à plus de 5km où 3 stratégies ont été effectuées / Pop cible du monitorage x 100",
+                    "B. Quantité des ressources essentielles existantes / Quantité des ressources essentielles requises pour couvrir la totalité de la pop cible x 100",
+                    "C. Pop cible qui a reçu Penta1 et VPO1 / Pop cible du monitorage x 100",
+                    "D. Pop cible correctement vaccinée / Pop cible du monitorage x 100"
+                ],
+                correct: [1],
+                selectCount: 1
+            },
+            {
+                id: 48, type: 'qcm',
+                text: "48. En monitorage vaccination, Accessibilité Géographique AG = ?",
+                options: [
+                    "A. Pop résidant dans un rayon de 10km / Pop cible du monitorage x 100",
+                    "B. Pop cible ayant effectué au moins une CPNr / Pop cible du monitorage x 100",
+                    "C. Pop en stratégie fixe + Pop à plus de 5km où au moins 3 stratégies ont été effectuées / Pop cible du monitorage x 100",
+                    "D. Ressources disponibles / Ressources requises x 100"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 49, type: 'qcm',
+                text: "49. En monitorage CPNr, AG = ?",
+                options: [
+                    "A. Pop en stratégie fixe + Pop à plus de 5km où au moins 3 stratégies ont été effectuées / Pop cible du monitorage x 100",
+                    "B. Pop résidant dans un rayon de 10km / Pop cible du monitorage x 100",
+                    "C. Pop cible ayant reçu au moins 4 CPNr / Pop cible du monitorage x 100",
+                    "D. Pop en stratégie fixe + Pop à plus de 5km où au moins 4 stratégies ont été effectuées / Pop cible du monitorage x 100"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 50, type: 'qcm',
+                text: "50. En monitorage CSC, AG = ?",
+                options: [
+                    "A. Pop en stratégie fixe + Pop à plus de 5km / Pop cible du monitorage x 100",
+                    "B. Pop cible consultée au moins une fois / Pop cible du monitorage x 100",
+                    "C. Pop cible traitée selon directives nationales / Pop cible du monitorage x 100",
+                    "D. Pop résidant dans un rayon de 10km / Pop cible du monitorage x 100"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 51, type: 'qcm',
+                text: "51. Utilisation des Services US en vaccination = ?",
+                options: [
+                    "A. Pop cible correctement vaccinée / Pop cible du monitorage x 100",
+                    "B. Pop cible ayant reçu au moins 4 CPNr / Pop cible du monitorage x 100",
+                    "C. Pop cible ayant reçu traitement et payé prix correct / Pop cible du monitorage x 100",
+                    "D. Pop cible qui a reçu le Penta1 et le VPO1 / Pop cible du monitorage x 100"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 52, type: 'qcm',
+                text: "52. Couverture Adéquate CA en CPNr = ?",
+                options: [
+                    "A. Pop cible ayant effectué au moins une CPNr / Pop cible du monitorage x 100",
+                    "B. Pop cible correctement vaccinée avec vaccins conservés entre +2°C et +8°C / Pop cible du monitorage x 100",
+                    "C. Pop cible ayant reçu au moins 4 CPNr et correctement vaccinée / Pop cible du monitorage x 100",
+                    "D. Pop cible ayant reçu traitement et payé prix correct / Pop cible du monitorage x 100"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 53, type: 'qcm',
+                text: "53. Couverture Effective CE en CSC = ?",
+                options: [
+                    "A. Pop cible correctement vaccinée / Pop cible du monitorage x 100",
+                    "B. Pop cible ayant été consultée au moins une fois / Pop cible du monitorage x 100",
+                    "C. Pop cible avec couverture adéquate et ayant reçu des conseils / Pop cible du monitorage x 100",
+                    "D. Pop cible ayant été traitée selon les directives nationales / Pop cible du monitorage x 100"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 54, type: 'qcm',
+                text: "54. Taux d'urbanisation Turb = ?",
+                options: [
+                    "A. Pop rurale / Pop totale x 100",
+                    "B. Nombre d'hommes / Nombre de femmes x 100",
+                    "C. Pop Urbaine / Pop totale x 100",
+                    "D. Pop totale / Superficie totale"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 55, type: 'qcm',
+                text: "55. Densité rurale drur = ?",
+                options: [
+                    "A. Population totale / Superficie totale",
+                    "B. Pop rurale / Superficie rurale",
+                    "C. Pop urbaine / Superficie urbaine",
+                    "D. Population rurale / Superficie agricole"
+                ],
+                correct: [1],
+                selectCount: 1
+            },
+            {
+                id: 56, type: 'qcm',
+                text: "56. Densité agricole d.agr = ?",
+                options: [
+                    "A. Population totale / Superficie totale",
+                    "B. Pop rurale / Superficie rurale",
+                    "C. Pop urbaine / Superficie urbaine",
+                    "D. Population rurale / Superficie agricole"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 57, type: 'qcm',
+                text: "57. Age moyen = ?",
+                options: [
+                    "A. L'âge qui a le plus grand effectif",
+                    "B. (Le plus petit âge + Le plus grand âge) / 2",
+                    "C. Nombre d'hommes / Nombre de femmes x 100",
+                    "D. Somme de chaque âge / Total des personnes ou des cases d'un tableau"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 58, type: 'qcm',
+                text: "58. Age médian = ?",
+                options: [
+                    "A. Somme des âges / Total des personnes",
+                    "B. L'âge avec le plus grand effectif",
+                    "C. Pop d'arrivée - Pop de départ / Pop départ x 100",
+                    "D. (Le plus petit âge du tableau + Le plus grand âge du tableau) / 2"
+                ],
+                correct: [3],
+                selectCount: 1
+            },
+            {
+                id: 59, type: 'qcm',
+                text: "59. Si population totale = 8000, quelle est la PC de 0 à 23 mois ?",
+                options: [
+                    "A. 1600",
+                    "B. 376",
+                    "C. 545,6",
+                    "D. 280"
+                ],
+                correct: [2],
+                selectCount: 1
+            },
+            {
+                id: 60, type: 'qcm',
+                text: "60. Si PC FAR = 1000, quelle est Pt ?",
+                options: [
+                    "A. 10000",
+                    "B. 5000",
+                    "C. 500",
+                    "D. 20000"
+                ],
+                correct: [1],
+                selectCount: 1
+            }
+        ];
+
+        let questions = [];
+        let userAnswers = {};
+        let globalTimerInterval = null;
+        let isQuizActive = false;
+        let wasAutoValidated = false;
+        let TOTAL_QUIZ_TIME = 60 * 60; 
+        let lastResultData = null;
+
+        function startQuiz() {
+            questions = masterQuestions.map((q, idx) => ({
+                ...q,
+                displayId: idx + 1
+            }));
+
+            TOTAL_QUIZ_TIME = 60 * 60;
+
+            const subInfo = document.getElementById('quiz-subtitle-info');
+            if (subInfo) {
+                subInfo.textContent = `Évaluation Santé Publique Formules (${questions.length} Questions — 60 minutes)`;
+            }
+
+            document.getElementById('top-left-badge').classList.add('hidden');
+            document.getElementById('top-right-badge').classList.add('hidden');
+
+            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('timer-container').classList.remove('hidden');
+            
+            isQuizActive = true;
+            wasAutoValidated = false;
+            userAnswers = {};
+            
+            let expireTime = parseInt(localStorage.getItem('quiz_sante_publique_expire'), 10);
+            if (!expireTime || expireTime < Date.now()) {
+                expireTime = Date.now() + (60 * 60 * 1000);
+                localStorage.setItem('quiz_sante_publique_expire', expireTime);
+            }
+            
+            renderAllQuestions();
+            startGlobalTimer();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function alertBox(message) {
+            const modal = document.createElement('div');
+            modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4";
+            modal.innerHTML = `
+                <div class="bg-white rounded-3xl max-w-lg w-full p-8 text-center shadow-2xl border border-slate-200 animate-pulse-subtle">
+                    <div class="w-20 h-20 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-5 border border-rose-100 shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-slate-900 font-black text-4xl md:text-5xl tracking-wide mb-3">ALERTE !!!</h3>
+                    <p class="text-rose-600 text-lg md:text-xl font-black mb-8 leading-relaxed">${message}</p>
+                    <button onclick="this.closest('.fixed').remove()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold py-4 rounded-2xl text-base uppercase tracking-wider transition shadow-lg shadow-orange-500/20 cursor-pointer">
+                        Compris
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function startGlobalTimer() {
+            clearInterval(globalTimerInterval);
+            
+            const updateTimerDisplay = () => {
+                let expireTime = parseInt(localStorage.getItem('quiz_sante_publique_expire'), 10);
+                const now = Date.now();
+                const remainingMs = expireTime - now;
+                const remainingSecs = Math.max(0, Math.ceil(remainingMs / 1000));
+                
+                const minutes = Math.floor(remainingSecs / 60);
+                const seconds = remainingSecs % 60;
+                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                const circlePath = document.getElementById('timer-circle-path');
+                const timerText = document.getElementById('timer-display-mini');
+                timerText.textContent = timeString;
+
+                if (circlePath) {
+                    const percentage = (remainingSecs / (60 * 60)) * 100;
+                    circlePath.setAttribute('stroke-dasharray', `${percentage}, 100`);
+                    
+                    if (remainingSecs <= 60) {
+                        circlePath.className = "text-rose-500 transition-all duration-300";
+                        timerText.className = "text-rose-600 font-black text-[10px] animate-pulse";
+                    } else {
+                        circlePath.className = "text-orange-500 transition-all duration-300";
+                        timerText.className = "text-slate-800 font-black text-[10px]";
+                    }
+                }
+
+                if (remainingSecs <= 0) {
+                    clearInterval(globalTimerInterval);
+                    localStorage.removeItem('quiz_sante_publique_expire');
+                    submitQuiz(true);
+                }
+            };
+
+            updateTimerDisplay();
+            globalTimerInterval = setInterval(updateTimerDisplay, 500);
+        }
+
+        function renderAllQuestions() {
+            const container = document.getElementById('all-questions-container');
+            let allHTML = '';
+
+            questions.forEach((q, index) => {
+                let badgeText = "";
+                let badgeClass = "";
+
+                if (q.type === 'vrai_faux') {
+                    badgeClass = "bg-rose-50 text-rose-700 border border-rose-200";
+                    badgeText = "QCD (±1 Pénalité)";
+                } else {
+                    badgeClass = "bg-emerald-50 text-emerald-700 border border-emerald-200";
+                    badgeText = "QCM (Choix unique)";
+                }
+
+                let optionsHTML = '';
+                if (q.type === 'vrai_faux') {
+                    q.options.forEach(val => {
+                        const rawVal = val.split('. ')[1];
+                        const isSelected = userAnswers[q.id] === rawVal;
+                        const optionClasses = isSelected 
+                            ? 'border-emerald-600 bg-emerald-600 text-white shadow-md ring-2 ring-emerald-600 font-semibold' 
+                            : 'border-slate-200 hover:bg-slate-50 text-slate-700 bg-white font-medium';
+
+                        optionsHTML += `
+                            <div onclick="toggleOption(${q.id}, '${rawVal}')" class="w-full p-3 rounded-xl border transition cursor-pointer flex items-center gap-3 text-xs md:text-sm ${optionClasses}">
+                                <input type="radio" name="q-${q.id}" value="${rawVal}" ${isSelected ? 'checked' : ''} class="h-4 w-4 pointer-events-none accent-emerald-600">
+                                <span>${val}</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    q.options.forEach((opt, optIdx) => {
+                        const selectedVal = userAnswers[q.id];
+                        const isSelected = selectedVal === optIdx;
+                        const optionClasses = isSelected 
+                            ? 'border-emerald-600 bg-emerald-600 text-white shadow-md ring-2 ring-emerald-600 font-semibold' 
+                            : 'border-slate-200 hover:bg-slate-50 text-slate-700 bg-white font-medium';
+
+                        optionsHTML += `
+                            <div onclick="toggleQcmOption(${q.id}, ${optIdx})" class="w-full p-3 rounded-xl border transition cursor-pointer flex items-center gap-3 text-xs md:text-sm ${optionClasses}">
+                                <input type="radio" name="q-${q.id}" value="${optIdx}" ${isSelected ? 'checked' : ''} class="h-4 w-4 pointer-events-none accent-emerald-600">
+                                <span>${opt}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                allHTML += `
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 shadow-sm space-y-3 w-full max-w-7xl mx-auto">
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                            <span class="text-xs md:text-sm font-extrabold text-slate-800">Question ${index + 1} / ${questions.length}</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="clearAnswer(${q.id})" class="text-[11px] font-bold text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200 px-2.5 py-0.5 rounded-lg transition shadow-sm cursor-pointer flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Effacer
+                                </button>
+                                <span class="text-[9px] font-semibold px-2 py-0.5 rounded-md ${badgeClass}">${badgeText}</span>
+                            </div>
+                        </div>
+                        <div class="font-bold text-sm md:text-base text-slate-900 leading-snug whitespace-pre-line">${q.text}</div>
+                        <div class="flex flex-col gap-2 pt-1 w-full">
+                            ${optionsHTML}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = allHTML;
+        }
+
+        function toggleOption(qId, val) {
+            userAnswers[qId] = val;
+            renderAllQuestions();
+        }
+
+        function toggleQcmOption(qId, optIdx) {
+            userAnswers[qId] = optIdx;
+            renderAllQuestions();
+        }
+
+        function clearAnswer(qId) {
+            delete userAnswers[qId];
+            renderAllQuestions();
+        }
+
+        function submitQuiz(autoVal = false) {
+            isQuizActive = false;
+            wasAutoValidated = autoVal;
+            clearInterval(globalTimerInterval);
+            localStorage.removeItem('quiz_sante_publique_expire');
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('timer-container').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            let scoreBrut = 0;
+            let correctCount = 0;
+            let wrongCount = 0;
+            let unansweredCount = 0;
+            let totalPenaltyPoints = 0;
+            
+            let detailedResultsForPDF = [];
+
+            questions.forEach((q, idx) => {
+                const userAns = userAnswers[q.id];
+                let status = 'unanswered';
+                let pts = 0;
+                let isAnswered = false;
+
+                if (q.type === 'vrai_faux') {
+                    if (userAns !== undefined) {
+                        isAnswered = true;
+                        if (userAns === q.correct) {
+                            status = 'correct';
+                            pts = 1;
+                            correctCount++;
+                        } else {
+                            status = 'wrong';
+                            pts = -1;
+                            wrongCount++;
+                            totalPenaltyPoints -= 1;
+                        }
+                    }
+                } else {
+                    if (userAns !== undefined && userAns !== null) {
+                        isAnswered = true;
+                        if (userAns === q.correct[0]) {
+                            status = 'correct';
+                            pts = 1;
+                            correctCount++;
+                        } else {
+                            status = 'wrong';
+                            pts = 0;
+                            wrongCount++;
+                        }
+                    }
+                }
+
+                if (!isAnswered) {
+                    unansweredCount++;
+                }
+
+                scoreBrut += pts;
+
+                let userAnsLabel = "Aucune réponse";
+                if (isAnswered) {
+                    if (q.type === 'vrai_faux') {
+                        userAnsLabel = userAns;
+                    } else {
+                        userAnsLabel = q.options[userAns];
+                    }
+                }
+
+                let correctAnsLabel = '';
+                if (q.type === 'vrai_faux') {
+                    correctAnsLabel = q.correct;
+                } else {
+                    correctAnsLabel = q.options[q.correct[0]];
+                }
+
+                detailedResultsForPDF.push({
+                    number: idx + 1,
+                    text: q.text,
+                    type: q.type,
+                    userAnswer: userAnsLabel,
+                    correctAnswer: correctAnsLabel,
+                    score: pts,
+                    status: status
+                });
+            });
+
+            let noteSur20 = (scoreBrut * 20) / questions.length;
+
+            lastResultData = {
+                note: noteSur20.toFixed(2),
+                scoreBrut: scoreBrut,
+                total: questions.length,
+                correct: correctCount,
+                wrong: wrongCount,
+                unanswered: unansweredCount,
+                details: detailedResultsForPDF
+            };
+
+            buildCorrectionModalContent();
+
+            const noteDisplay = document.getElementById('final-note-display');
+            const appreciationBanner = document.getElementById('appreciation-banner');
+            const penaltySummarybadge = document.getElementById('penalty-summary-badge');
+            
+            noteDisplay.textContent = `${noteSur20.toFixed(2)} / 20`;
+            
+            if (totalPenaltyPoints < 0) {
+                penaltySummarybadge.textContent = `Pénalités appliquées (Vrai/Faux) : ${totalPenaltyPoints} pt(s)`;
+            } else {
+                penaltySummarybadge.textContent = `Pénalités appliquées (Vrai/Faux) : 0 pt(s)`;
+            }
+
+            let mentionText = '';
+            let bannerClass = '';
+            
+            if (wasAutoValidated) {
+                mentionText = "INFRACTION SÉCURITÉ : Vous avez quitté la fenêtre du devoir, votre devoir a donc été immédiatement validé.";
+                bannerClass = "bg-gradient-to-r from-red-950 via-rose-950 to-black text-white shadow-red-950/80 border-2 border-red-600 animate-pulse text-red-500 font-extrabold";
+            } else if (noteSur20 < 0) {
+                mentionText = "Score négatif ! Les indicateurs de santé publique s'affolent.";
+                bannerClass = "bg-gradient-to-r from-red-950 via-black to-red-950 text-white shadow-red-950/80 border-2 border-red-600";
+            } else if (noteSur20 <= 2) {
+                mentionText = "Catastrophe ! Les formules fondamentales nécessitent une révision d'urgence.";
+                bannerClass = "bg-gradient-to-r from-red-950 via-rose-900 to-black text-white shadow-red-900/60 border-2 border-red-500";
+            } else if (noteSur20 > 2 && noteSur20 <= 5) {
+                mentionText = "Frustrant... Les calculs démographiques et les taux demandent un sérieux approfondissement.";
+                bannerClass = "bg-gradient-to-r from-red-800 to-rose-900 text-white shadow-red-800/40 border border-red-600/40";
+            } else if (noteSur20 > 5 && noteSur20 <= 8) {
+                mentionText = "Aïe, c'est dur. Il faut revoir les proportions et les indicateurs sanitaires.";
+                bannerClass = "bg-gradient-to-r from-orange-600 to-rose-600 text-white shadow-orange-500/20 border border-orange-400/30";
+            } else if (noteSur20 > 8 && noteSur20 < 10) {
+                mentionText = "Franchement frustrant ! À un cheveu près de la moyenne... Retente ta chance !";
+                bannerClass = "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-amber-500/20 border border-amber-400/30";
+            } else if (noteSur20 >= 10 && noteSur20 <= 12) {
+                mentionText = "Ouf, la moyenne ! C'est acquis de justesse. Tu maitrises l'essentiel en santé publique.";
+                bannerClass = "bg-gradient-to-r from-indigo-600 to-blue-700 text-white shadow-indigo-500/20 border border-indigo-400/30";
+            } else if (noteSur20 > 12 && noteSur20 <= 15) {
+                mentionText = "Encourageant ! On sent que tu as bien assimilé les formules de santé publique.";
+                bannerClass = "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-blue-500/20 border border-blue-400/30";
+            } else if (noteSur20 > 15 && noteSur20 <= 18) {
+                mentionText = "Très belle performance ! Tes connaissances et calculs sont solides.";
+                bannerClass = "bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-teal-500/20 border border-teal-300/30";
+            } else {
+                mentionText = "Majestueux ! Un sans-faute digne d'un expert en santé publique.";
+                bannerClass = "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-emerald-500/30 border border-emerald-400/40";
+            }
+            
+            appreciationBanner.innerHTML = `
+                <div class="text-xs md:text-sm font-bold italic leading-relaxed text-center ${wasAutoValidated ? 'text-red-500 font-extrabold text-sm' : ''}">
+                    "${mentionText}"
+                </div>
+            `;
+            appreciationBanner.className = `mb-4 max-w-xl mx-auto p-3 rounded-2xl shadow-md transition-all duration-300 ${bannerClass}`;
+
+            document.getElementById('final-brut-display').textContent = `Score Brut : ${scoreBrut} / ${questions.length}`;
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('wrong-count').textContent = wrongCount;
+            document.getElementById('unanswered-count').textContent = unansweredCount;
+        }
+
+        function toggleCorrectionModal() {
+            const modal = document.getElementById('correction-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function buildCorrectionModalContent() {
+            if (!lastResultData) return;
+            const container = document.getElementById('correction-content-container');
+            let html = '';
+
+            lastResultData.details.forEach((item) => {
+                let badgeColor = '';
+                let badgeText = '';
+                if (item.status === 'correct') {
+                    badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                    badgeText = `Correct (+${item.score})`;
+                } else if (item.status === 'wrong') {
+                    badgeColor = 'bg-rose-50 text-rose-700 border-rose-200';
+                    badgeText = `Faux (${item.score})`;
+                } else {
+                    badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
+                    badgeText = 'Sans réponse (0)';
+                }
+
+                html += `
+                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-black text-slate-800">Question ${item.number}</span>
+                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-lg border ${badgeColor}">${badgeText}</span>
+                        </div>
+                        <div class="text-xs md:text-sm font-bold text-slate-900 leading-snug whitespace-pre-line">${item.text}</div>
+                        <div class="text-xs space-y-1 pt-1 border-t border-slate-200">
+                            <div class="text-slate-600"><strong class="text-slate-800">Votre réponse :</strong> <span class="${item.status === 'correct' ? 'text-emerald-700 font-bold' : (item.status === 'wrong' ? 'text-rose-700 font-bold' : 'text-slate-500')}">${item.userAnswer}</span></div>
+                            <div class="text-slate-600"><strong class="text-slate-800">Réponse attendue :</strong> <span class="text-emerald-700 font-bold">${item.correctAnswer}</span></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function restartQuiz() {
+            isQuizActive = false;
+            wasAutoValidated = false;
+            userAnswers = {};
+            localStorage.removeItem('quiz_sante_publique_expire');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('welcome-screen').classList.remove('hidden');
+            document.getElementById('timer-container').classList.add('hidden');
+
+            document.getElementById('top-left-badge').classList.remove('hidden');
+            document.getElementById('top-right-badge').classList.remove('hidden');
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden && isQuizActive) {
+                handleCheating("INFRACTION SÉCURITÉ : Vous avez quitté la fenêtre du devoir, votre devoir a donc été immédiatement validé.");
+            }
+        });
+
+        window.addEventListener("blur", () => {
+            if (isQuizActive) {
+                handleCheating("INFRACTION SÉCURITÉ : Vous avez quitté la fenêtre du devoir, votre devoir a donc été immédiatement validé.");
+            }
+        });
+
+        function handleCheating(reason) {
+            if (isQuizActive) {
+                isQuizActive = false;
+                submitQuiz(true);
+                alertBox(reason);
+            }
+        }
+    </script>
+</body>
+</html>
